@@ -6,17 +6,59 @@
 <head>
   <meta charset="UTF-8">
   <title>게시글 수정</title>
-  <!-- Bootstrap CSS 링크 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
   <style>
     body {
-      background-color: #f8f9fa;
+      font-family: 'Gaegu', sans-serif;
+      background-color: #b7dce8;
     }
+
+    header {
+      background-color: #4c88cf;
+      color: white;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    form .form-label {
+      font-weight: bold;
+    }
+
+    form .form-control {
+      border-radius: 8px;
+    }
+
+    form .form-control:focus {
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+    }
+
     #map {
-      width: 100%;
+      border: 2px solid #4a90e2;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       height: 400px;
       margin-top: 10px;
     }
+
+    .btn-primary {
+      background-color: #4a90e2;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #3b7fc9;
+    }
+
     .img-thumbnail {
       width: 150px;
       height: auto;
@@ -29,7 +71,7 @@
 
 <body>
 <div layout:fragment="content">
-  <header class="bg-dark py-5">
+  <header class="py-5">
     <div class="container px-4 px-lg-5 my-5">
       <div class="text-center text-white">
         <h1 class="display-4 fw-bolder">게시글 수정</h1>
@@ -40,30 +82,24 @@
 
   <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
-      <div th:if="${error}" class="alert alert-danger" role="alert">
-        <p th:text="${error}"></p>
-      </div>
-      <form th:action="@{/posting/modify/{postId}(postId=${post.postId})}" method="post" enctype="multipart/form-data" onsubmit="return confirm('수정하시겠습니까?');">
+      <form th:action="@{/posting/modify/{postId}(postId=${post.postId})}" method="post" enctype="multipart/form-data">
         <input type="hidden" th:value="${post.postId}" name="postId" />
 
-        <!-- 제목 입력 필드 -->
         <div class="mb-3">
           <label for="title" class="form-label">제목</label>
           <input type="text" class="form-control" id="title" name="title" th:value="${post.title}" required>
         </div>
 
-        <!-- 내용 입력 필드 -->
         <div class="mb-3">
           <label for="contentText" class="form-label">내용</label>
           <textarea class="form-control" id="contentText" name="contentText" rows="5" required>[[${post.contentText}]]</textarea>
         </div>
 
-        <!-- 모집 인원 입력 필드 -->
         <div class="mb-3">
           <label for="requiredParticipants" class="form-label">모집 인원</label>
           <input type="number" class="form-control" id="requiredParticipants" name="requiredParticipants" th:value="${post.requiredParticipants}" min="1" required>
         </div>
-        <!--모집마감일-->
+
         <div class="mb-3">
           <label for="deadline" class="form-label">모집 마감일</label>
           <input type="date" class="form-control" id="deadline" name="deadline"
@@ -71,75 +107,59 @@
                  min="${T(java.time.LocalDate).now()}" required>
         </div>
 
-        <!-- 장소 검색 및 지도 표시 영역 -->
         <div>
-          <label>만남 장소 설정</label>
-          <input type="text" id="search" placeholder="장소 검색" style="width:80%; margin-bottom:10px;">
-          <button type="button" id="searchButton">검색</button>
+          <label for="search" class="form-label">만남 장소 설정</label>
+          <input type="text" id="search" class="form-control" placeholder="장소 검색">
+          <button type="button" id="searchButton" class="btn btn-primary mt-2">검색</button>
           <div id="map"></div>
         </div>
-        <!-- 기존 장소 데이터를 유지 -->
+
         <input type="hidden" id="latitude" name="lat" th:value="${post.lat}">
         <input type="hidden" id="longitude" name="lng" th:value="${post.lng}">
 
-        <!-- 기존 이미지 미리보기 -->
         <div th:if="${originalImages != null && originalImages.size() > 0}">
           <label class="form-label">기존 이미지 미리보기</label>
           <div th:each="image : ${originalImages}">
-            <img th:src="${image}" alt="기존 이미지 미리보기" class="img-thumbnail" style="width: 150px; height: auto;" />
+            <img th:src="${image}" alt="기존 이미지 미리보기" class="img-thumbnail" />
           </div>
         </div>
 
-        <!-- 이미지 업로드 필드 -->
         <div class="mb-3">
           <label for="files" class="form-label">이미지 업로드</label>
           <input type="file" class="form-control" id="files" name="files" accept="image/*" multiple>
-          <div class="form-text">이미지 파일만 업로드할 수 있습니다. 기존 이미지는 유지됩니다.</div>
         </div>
 
-        <!-- 수정 버튼과 목록으로 돌아가기 버튼 -->
-        <button type="submit" class="btn btn-primary">게시글 수정</button>
-        <a th:href="@{/posting/list}" class="btn btn-secondary">목록으로 돌아가기</a>
+        <button type="submit" class="btn btn-primary">수정</button>
+        <a th:href="@{/posting/list}" class="btn btn-secondary">목록으로</a>
       </form>
     </div>
   </section>
 
-  <!-- 지도 초기화 및 검색 기능을 위한 스크립트 -->
   <script>
-    let map, infoWindow, marker;
+    let map, marker;
 
     function initializeMap() {
-      // 기존 위도/경도 값을 설정
-      const initialLat = parseFloat(document.getElementById('latitude').value) || 37.3595316;
-      const initialLng = parseFloat(document.getElementById('longitude').value) || 127.1052133;
+      const lat = parseFloat(document.getElementById('latitude').value) || 37.3595316;
+      const lng = parseFloat(document.getElementById('longitude').value) || 127.1052133;
 
       map = new naver.maps.Map("map", {
-        center: new naver.maps.LatLng(initialLat, initialLng), // 기존 위도/경도 값 사용
+        center: new naver.maps.LatLng(lat, lng),
         zoom: 15,
       });
 
-      // 기존 위치에 마커 설정
       marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(initialLat, initialLng),
+        position: new naver.maps.LatLng(lat, lng),
         map: map,
       });
 
-      infoWindow = new naver.maps.InfoWindow({ anchorSkew: true });
-
-      // 지도 클릭 이벤트
       naver.maps.Event.addListener(map, "click", function (e) {
         const lat = e.coord.lat();
         const lng = e.coord.lng();
-
-        // 마커 이동
         marker.setPosition(e.coord);
-
-        // 위도/경도 값 업데이트
         document.getElementById('latitude').value = lat;
         document.getElementById('longitude').value = lng;
       });
 
-      // 검색 버튼 클릭 이벤트
       document.getElementById("searchButton").addEventListener("click", function () {
         const address = document.getElementById("search").value;
         if (address.trim() === "") {
@@ -160,40 +180,15 @@
         const result = response.v2.addresses[0];
         const coord = new naver.maps.LatLng(result.y, result.x);
 
-        map.setCenter(coord); // 지도 중심 이동
-        marker.setPosition(coord); // 마커 위치 이동
+        map.setCenter(coord);
+        marker.setPosition(coord);
 
-        // 위도/경도 값 업데이트
-        document.getElementById("latitude").value = coord.lat();
-        document.getElementById("longitude").value = coord.lng();
-
-        infoWindow.setContent(`<div style="padding:10px;">${result.roadAddress || result.jibunAddress}</div>`);
-        infoWindow.open(map, coord);
+        document.getElementById('latitude').value = coord.lat();
+        document.getElementById('longitude').value = coord.lng();
       });
     }
 
     naver.maps.onJSContentLoaded = initializeMap;
-  </script>
-
-  <!-- 수정 완료 메시지 표시 스크립트 -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('result') === 'modified') {
-        alert("수정이 완료되었습니다.");
-      }
-    });
-    //모집마감기한부분
-    document.querySelector('form').addEventListener('submit', function (event) {
-      const deadlineInput = document.getElementById('deadline').value;
-      const selectedDate = new Date(deadlineInput);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selectedDate < today) {
-        alert("모집 마감일은 오늘 이후의 날짜여야 합니다.");
-        event.preventDefault();
-      }
-    });
   </script>
 </div>
 </body>

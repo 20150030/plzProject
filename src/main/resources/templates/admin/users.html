@@ -4,68 +4,146 @@
     <meta charset="UTF-8">
     <title>관리자 - 사용자 목록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Gaegu', sans-serif;
+            background-color: #b7dce8; /* 밝은 블루 배경 */
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 전체 화면 높이 확보 */
+        }
+
+        /* 메인 컨텐츠 */
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        /* 헤더 스타일 */
+        header {
+            background-color: #4c88cf;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px; /* 행 간격 */
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        table thead {
+            background-color: #4c88cf;
+            color: white;
+            font-size: 1.1rem;
+            border-radius: 15px;
+        }
+
+        table thead th {
+            padding: 12px;
+            text-align: center;
+            border: none;
+        }
+
+        table tbody tr {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+
+        table tbody td {
+            padding: 12px;
+            text-align: center;
+            font-size: 1rem;
+            border: none;
+        }
+
+        /* 테이블 행 간 간격 */
+        table tbody tr:not(:last-child) {
+            margin-bottom: 10px;
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            border-radius: 20px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #6ba4d9;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #4c88cf;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-<div layout:fragment="content" class="container mt-4">
-    <header class="bg-dark py-4 text-white text-center">
-        <h2 class="display-6">사용자 관리</h2>
-        <p class="lead">관리자는 모든 사용자를 관리하고 강퇴할 수 있습니다.</p>
+<div layout:fragment="content">
+
+    <header class="py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">회원 리스트</h1>
+                <p class="lead fw-normal text-white-50 mb-0">현재 가입한 회원들을 확인해보세요!</p>
+            </div>
+        </div>
     </header>
 
-    <!-- 사용자 목록 테이블 -->
-    <div class="container mt-4">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-            <tr>
-                <th>아이디</th>
-                <th>이름</th>
-                <th>로그인 아이디</th>
-                <th>이메일</th>
-                <th>권한</th>
-                <th>가입 날짜</th>
-                <th>강퇴</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.userId}"></td>
-                <td th:text="${user.name}"></td>
-                <td th:text="${user.username}"></td>
-                <td th:text="${user.email}"></td>
-                <td th:text="${user.role}"></td>
-                <td th:text="${#dates.format(user.signupDate, 'yyyy-MM-dd')}"></td>
-                <td>
-                    <button class="btn btn-danger" th:onclick="|banUser(${user.userId})|">강퇴</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="content">
+        <!-- 사용자 목록 테이블 -->
+        <div class="container mt-4">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>아이디</th>
+                    <th>가입 날짜</th>
+                    <th>생년월일</th>
+                    <th>도시</th>
+                    <th>주</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${userList}">
+                    <td th:text="${user.name}"></td> <!-- 이름 -->
+                    <td th:text="${user.username}"></td> <!-- 아이디 -->
+                    <td th:text="${#temporals.format(user.signupDate, 'yyyy-MM-dd')}"></td> <!-- 가입 날짜 -->
+                    <td th:text="${user.birthDate}"></td> <!-- 생년월일 -->
+                    <td th:text="${user.city}"></td> <!-- 도시 -->
+                    <td th:text="${user.state}"></td> <!-- 주 -->
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <!-- 강퇴 기능을 위한 JavaScript -->
-    <script th:inline="javascript">
-        function banUser(userId) {
-            const confirmation = confirm("정말 이 사용자를 강퇴하시겠습니까?");
-            if (confirmation) {
-                fetch('/admin/users/' + userId + '/ban', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        alert('사용자가 강퇴되었습니다.');
-                        window.location.reload();  // 페이지를 새로고침하여 목록 갱신
-                    } else {
-                        alert('강퇴에 실패했습니다. 다시 시도해주세요.');
-                    }
-                }).catch(error => {
-                    console.error('Error banning user:', error);
-                    alert('강퇴 처리 중 오류가 발생했습니다.');
-                });
-            }
-        }
-    </script>
 </div>
+
 </body>
 </html>

@@ -15,7 +15,7 @@ public interface PostService {
     Long register(PostDTO postDTO);
 
     // 게시글 상세 조회
-    PostDTO readOne(Long postId);
+    PostDTO readOne(Long postId,Boolean isAdmin);
 
     // 게시글 수정
     void modify(PostDTO postDTO);

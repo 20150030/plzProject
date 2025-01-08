@@ -27,7 +27,9 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
      * @return 해당 상태의 Report 엔티티 리스트
      */
     List<Report> findByStatus(Report.ReportStatus status);
-
+    // 비공개 상태가 아닌 글만 조회
+    @Query("SELECT r FROM Report r WHERE r.status = 'PENDING' AND r.post.isVisible = true")
+    List<Report> findPendingAndVisibleReports();
     /**
      * 특정 게시글(postId)에 대한 모든 신고 목록 조회
      *

@@ -7,40 +7,154 @@
     <meta charset="UTF-8">
     <title>관리자 대시보드</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            font-family: 'Gaegu', sans-serif;
+            background-color: #b7dce8;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
         }
+
+        /* 헤더 섹션 스타일 */
+        header {
+            background-color: #4c88cf; /* 헤더 색 */
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .card-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         .card {
-            margin-bottom: 20px;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background-color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 15px;
+            color: white;
+        }
+
+        .card-header.bg-primary {
+            background-color: #D2B6FF !important;
+            transition: background-color 0.3s ease;
+        }
+
+        .card-header.bg-primary:hover {
+            background-color: #B593E0; !important; /* 파스텔 블루 - 호버 */
+        }
+
+        .card-header.bg-success {
+            background-color: #FFEA8A !important;
+            transition: background-color 0.3s ease;
+
+        }
+
+        .card-header.bg-success:hover {
+            background-color: #DFC872 !important; /* 파스텔 그린 - 호버 */
+        }
+
+        .card-body {
+            padding: 15px;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .btn-warning {
+            background-color: #4c88cf;
+            border: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-warning:hover {
+            background-color: #3b7fc9;
+        }
+
+        footer {
+            background-color: #4c88cf;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: auto;
         }
     </style>
 </head>
 
 <body>
-<div layout:fragment="content" class="container mt-5">
-    <header class="text-center mb-4">
-        <h1 class="display-4">관리자 대시보드</h1>
-        <p class="lead">신고글 관리 및 유저 관리를 위한 페이지입니다.</p>
+<div layout:fragment="content">
+    <!-- 헤더 -->
+    <header class="py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">관리자 대시보드</h1>
+                <p class="lead fw-normal text-white-50 mb-0">"신고글 관리 및 유저 관리를 위한 페이지입니다”</p>
+            </div>
+
+        </div>
     </header>
 
-    <div class="row">
-        <div class="col-md-6">
+    <!-- 메인 컨텐츠 -->
+    <div class="main-container">
+        <div class="card-container">
+            <!-- 신고글 관리 카드 -->
             <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5>신고글 관리</h5>
+                <div class="card-header bg-primary">
+                    신고글 관리
                 </div>
                 <div class="card-body">
                     <p>신고된 게시글을 확인하고 관리할 수 있습니다.</p>
                     <a href="/admin/reports" class="btn btn-warning">신고글 목록 보기</a>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6">
+            <!-- 유저 관리 카드 -->
             <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5>유저 관리</h5>
+                <div class="card-header bg-success">
+                    유저 관리
                 </div>
                 <div class="card-body">
                     <p>유저 정보를 확인하고 관리할 수 있습니다.</p>
@@ -50,5 +164,10 @@
         </div>
     </div>
 </div>
+
+<!-- 푸터 -->
+<footer>
+    &copy; 2024 BooTakHey! All rights reserved.
+</footer>
 </body>
 </html>

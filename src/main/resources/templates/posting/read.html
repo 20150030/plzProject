@@ -442,7 +442,7 @@
 
 
 
-//신고&신청 스크립트
+        //신고&신청 스크립트
         document.addEventListener('DOMContentLoaded', function () {
 
             // 신고하기 모달 이벤트 핸들러
@@ -496,7 +496,7 @@
                     })
                     .catch(error => {
                         console.error('신고 실패:', error.message);
-                        alert('신고에 실패했습니다. 다시 시도해주세요.');
+                        alert('이미 해당 게시글을 신고하였습니다.');
                     });
             });
 
@@ -506,82 +506,82 @@
                 document.getElementById('reason').value = ''; // 신고 사유 초기화
             });
         });
-            // 신청하기 버튼 클릭 시, 모달에 postId 설정
-            document.querySelectorAll('.btn-primary[data-bs-target="#applyModal"]').forEach(button => {
-                button.addEventListener('click', function () {
-                    const postId = this.getAttribute('data-post-id'); // 버튼의 data-post-id 값 가져오기
-                    console.log('신청하기 버튼 클릭 - Post ID:', postId);
+        // 신청하기 버튼 클릭 시, 모달에 postId 설정
+        document.querySelectorAll('.btn-primary[data-bs-target="#applyModal"]').forEach(button => {
+            button.addEventListener('click', function () {
+                const postId = this.getAttribute('data-post-id'); // 버튼의 data-post-id 값 가져오기
+                console.log('신청하기 버튼 클릭 - Post ID:', postId);
 
-                    // 모달에 postId 저장
-                    const applyModal = document.getElementById('applyModal');
-                    applyModal.setAttribute('data-post-id', postId);
-                });
+                // 모달에 postId 저장
+                const applyModal = document.getElementById('applyModal');
+                applyModal.setAttribute('data-post-id', postId);
             });
+        });
 
-            // 신청하기 모달의 신청 버튼 클릭 이벤트
-            document.getElementById('submitApplication').addEventListener('click', function () {
-                const applyModal = document.getElementById('applyModal'); // 모달 DOM 요소
-                const postId = applyModal.getAttribute('data-post-id'); // 모달에서 postId 가져오기
-                const applicationReason = document.getElementById('applicationReason').value.trim();
+        // 신청하기 모달의 신청 버튼 클릭 이벤트
+        document.getElementById('submitApplication').addEventListener('click', function () {
+            const applyModal = document.getElementById('applyModal'); // 모달 DOM 요소
+            const postId = applyModal.getAttribute('data-post-id'); // 모달에서 postId 가져오기
+            const applicationReason = document.getElementById('applicationReason').value.trim();
 
-                if (!postId) {
-                    alert('게시글 ID가 유효하지 않습니다.');
-                    console.error('Post ID가 유효하지 않음:', postId);
-                    return;
-                }
+            if (!postId) {
+                alert('게시글 ID가 유효하지 않습니다.');
+                console.error('Post ID가 유효하지 않음:', postId);
+                return;
+            }
 
-                if (!applicationReason) {
-                    alert('신청 사유를 입력해주세요.');
-                    return;
-                }
+            if (!applicationReason) {
+                alert('신청 사유를 입력해주세요.');
+                return;
+            }
 
-                console.log('신청 요청 - Post ID:', postId, '신청 사유:', applicationReason);
+            console.log('신청 요청 - Post ID:', postId, '신청 사유:', applicationReason);
 
-                // 서버로 신청 요청 보내기
-                fetch('/request/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        postId: postId,
-                        contentText: applicationReason,
-                    }),
+            // 서버로 신청 요청 보내기
+            fetch('/request/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    postId: postId,
+                    contentText: applicationReason,
+                }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(err => {
+                            console.error('신청 실패:', err);
+                            throw new Error(err);
+                        });
+                    }
+                    return response.text();
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.text().then(err => {
-                                console.error('신청 실패:', err);
-                                throw new Error(err);
-                            });
-                        }
-                        return response.text();
-                    })
-                    .then(data => {
-                        console.log('신청 성공:', data);
+                .then(data => {
+                    console.log('신청 성공:', data);
 
-                        // 모달 닫기
-                        const modalInstance = bootstrap.Modal.getInstance(applyModal);
-                        if (modalInstance) {
-                            modalInstance.hide(); // 모달 닫기
-                        }
+                    // 모달 닫기
+                    const modalInstance = bootstrap.Modal.getInstance(applyModal);
+                    if (modalInstance) {
+                        modalInstance.hide(); // 모달 닫기
+                    }
 
-                        // 페이지 이동
-                        setTimeout(() => {
-                            alert(data); // 성공 메시지 표시
-                            window.location.href = `/posting/read/${postId}`; // read 페이지로 이동
-                        }, 300); // 모달이 닫힌 후 리다이렉션
-                    })
-                    .catch(error => {
-                        console.error('신청 실패:', error.message);
-                        alert('신청에 실패했습니다. 이유: ' + error.message);
-                    });
-            });
+                    // 페이지 이동
+                    setTimeout(() => {
+                        alert(data); // 성공 메시지 표시
+                        window.location.href = `/posting/read/${postId}`; // read 페이지로 이동
+                    }, 300); // 모달이 닫힌 후 리다이렉션
+                })
+                .catch(error => {
+                    console.error('신청 실패:', error.message);
+                    alert('신청에 실패했습니다. 이유: ' + error.message);
+                });
+        });
 
-            // 모달 닫힐 때 입력 필드 초기화
-            document.getElementById('applyModal').addEventListener('hidden.bs.modal', function () {
-                document.getElementById('applicationReason').value = ''; // 입력 필드 초기화
-            });
+        // 모달 닫힐 때 입력 필드 초기화
+        document.getElementById('applyModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('applicationReason').value = ''; // 입력 필드 초기화
+        });
 
 
 
@@ -630,6 +630,7 @@
         const replyContent = document.querySelector('#replyContent'); // 댓글 입력란
         const childReplyContent = document.querySelector('#childReplyContent'); // 대댓글 입력란
         const childReplyBox = document.querySelector('#childReplyBox'); // 대댓글 입력 영역
+        const deleteReplyBtn = document.querySelector('.deleteBtn')
         let parentReplyId = null; // 대댓글의 부모 ID 저장
 
         //시간 포맷 변경 함수
@@ -741,6 +742,25 @@
             }
         });
 
+        // 댓글 삭제 이벤트
+        document.body.addEventListener('click', (e) => {
+            // 댓글 삭제 버튼 클릭 시
+            if (e.target.classList.contains('deleteBtn')) {
+                const replyId = e.target.getAttribute('data-replyid'); // 댓글 ID 가져오기
+
+                if (confirm('정말 이 댓글을 삭제하시겠습니까?')) {
+                    // 댓글 삭제 요청
+                    deleteReply(replyId, postId).then(() => {
+                        alert('댓글이 삭제되었습니다.');
+                        printReplies(); // 댓글 리스트 갱신
+                    }).catch(e => {
+                        alert('댓글 삭제 중 오류가 발생했습니다.');
+                        console.error(e);
+                    });
+                }
+            }
+        });
+
         // 글자수 표시 함수
         function updateCharCount() {
             const contentLength = replyContent.value.length;
@@ -774,6 +794,17 @@
         async function addReply(replyObj, postId) {
             try {
                 const response = await axios.post(`/replies/${postId}`, replyObj);
+                return response.data;
+            } catch (error) {
+                console.error(error);
+                throw error;
+            }
+        }
+
+        // 댓글 삭제 API 호출 함수
+        async function deleteReply(replyId) {
+            try {
+                const response = await axios.delete(`/replies/${replyId}`);
                 return response.data;
             } catch (error) {
                 console.error(error);

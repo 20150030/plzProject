@@ -186,9 +186,9 @@ public class PostServiceImpl implements PostService {
      * @return 조회된 게시글의 DTO
      */
     @Override
-    public PostDTO readOne(Long postId) {
+    public PostDTO readOne(Long postId,Boolean isAdmin) {
         Post post = postRepository.findById(postId)
-                .filter(Post::isVisible) // 공개 상태인 게시글만 조회
+                .filter(postEntity -> isAdmin || postEntity.isVisible())
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없거나 비공개 상태입니다."));
 
         return convertToDTO(post); // 엔티티를 DTO로 변환하여 반환

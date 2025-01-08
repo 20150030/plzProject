@@ -61,4 +61,12 @@ public interface ReportService {
      * @return 해당 신고와 관련된 게시글의 ID
      */
     Long getPostIdByReportId(Long reportId);
+
+    /**
+     * 중복 신고를 제거하고 신고 건수를 합산하여 반환합니다.
+     *
+     * @param onlyVisible true이면 공개된 글만 포함, false이면 전체 글 포함
+     * @return 중복 신고가 제거된 신고 리스트
+     */
+    List<ReportDTO> getUniqueReportsWithCounts(Boolean onlyVisible);
 }

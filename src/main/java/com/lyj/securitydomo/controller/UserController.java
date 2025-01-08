@@ -151,7 +151,10 @@ public class UserController {
     @GetMapping("/readwriting/{postId}")
     public String read(@PathVariable Long postId, Model model,
                        @AuthenticationPrincipal PrincipalDetails principal) {
-        PostDTO postDTO = postService.readOne(postId);
+        // 관리자 여부 확인
+        boolean isAdmin = "ADMIN".equals(principal.getUser().getRole());
+
+        PostDTO postDTO = postService.readOne(postId,isAdmin);
         log.info(postDTO);
         model.addAttribute("post", postDTO);
         model.addAttribute("originalImages", postDTO.getOriginalImageLinks()); // 이미지 링크 추가

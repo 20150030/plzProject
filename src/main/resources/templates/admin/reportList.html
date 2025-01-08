@@ -4,28 +4,128 @@
     <meta charset="UTF-8">
     <title>신고 글 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
     <style>
-        .custom-toggle-label {
-            font-weight: bold;
-            margin-left: 0.5rem;
+        body {
+            font-family: 'Gaegu', sans-serif;
+
+            background-color: #b7dce8;
+
+            margin: 0;
+            padding: 0;
         }
 
+        /* 헤더 스타일 */
+        header {
+            background-color: #4c88cf;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 테이블 스타일 */
+        table {
+            background-color: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table thead {
+            background-color: #4c88cf;
+            color: white;
+        }
+
+        table thead th {
+            text-align: center;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table tbody tr:hover {
+            background-color: #e0e0e0;
+        }
+
+        table td, table th {
+            padding: 12px;
+            text-align: center;
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-info {
+            background-color: #a6c1e1;
+            color: white;
+            border: none;
+        }
+
+        .btn-info:hover {
+            background-color: #89aad3;
+        }
+
+        .btn-warning {
+            background-color: #ffc785;
+            color: white;
+            border: none;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0aa6f;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #a8d5ba;
+            color: white;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #8cbfa0;
+        }
+
+        /* 필터 토글 스타일 */
         .form-switch .form-check-input {
             width: 2.5rem;
             height: 1.25rem;
-            background-color: #ccc;
+            background-color: #ddd;
             border-radius: 1rem;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
         .form-switch .form-check-input:checked {
-            background-color: #28a745;
+            background-color: #6ba4d9;
+        }
+
+        .custom-toggle-label {
+            font-weight: bold;
+            margin-left: 0.5rem;
+            color: #4c88cf;
+        }
+
+        /* 컨테이너 마진 조정 */
+        .container {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 <div layout:fragment="content">
-    <header class="bg-dark py-5">
+    <header class="py-5">
         <div class="container px-4 px-lg-5 my-5">
             <div class="text-center text-white">
                 <h1 class="display-4 fw-bolder">신고 글 관리</h1>
@@ -34,21 +134,26 @@
         </div>
     </header>
 
-    <div class="container mt-4">
+    <div class="container">
         <!-- 필터 토글 -->
         <div class="d-flex align-items-center">
             <label class="form-check-label" for="reportToggleSwitch">전체 글 보기</label>
             <div class="form-check form-switch mx-3">
-                <input class="form-check-input" type="checkbox" id="reportToggleSwitch" th:checked="${filter == 'in-progress'}">
+                <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="reportToggleSwitch"
+                        data-filter="all"
+                        onchange="toggleReportFilter(this)">
             </div>
-            <label class="form-check-label custom-toggle-label" for="reportToggleSwitch">처리 중 보기</label>
+            <label class="form-check-label custom-toggle-label" for="reportToggleSwitch">공개된 글 보기</label>
         </div>
 
         <!-- 신고 글 목록 테이블 -->
         <div class="row mt-3">
             <div class="col-12">
                 <table class="table table-bordered">
-                    <thead class="table-dark">
+                    <thead>
                     <tr>
                         <th>글 제목</th>
                         <th>신고 횟수</th>
@@ -79,49 +184,37 @@
             </div>
         </div>
     </div>
-
     <!-- JavaScript -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const toggleSwitch = document.getElementById("reportToggleSwitch");
 
-            // 필터 토글 비동기 요청
+            // 스위치 버튼 상태 변경 이벤트
             toggleSwitch.addEventListener("change", function () {
-                const filterType = toggleSwitch.checked ? "in-progress" : "all"; // 필터 상태 결정
-                fetchReports(filterType); // 필터링된 데이터를 가져오기 위한 함수 호출
+                toggleReportFilter(toggleSwitch); // 스위치 상태 변경 시 함수 호출
             });
         });
 
-        // 비동기적으로 데이터를 가져와 페이지에 반영하는 함수
-        function fetchReports(filterType) {
-            const url = `/admin/reports?filter=${filterType}`;
+        // 스위치 버튼 상태에 따라 신고 목록 필터링
+        function toggleReportFilter(switchElement) {
+            const filter = switchElement.checked ? "visible" : "all"; // 필터 값 설정
 
-            fetch(url)
+            fetch(`/admin/reports?filter=${filter}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("네트워크 응답이 올바르지 않습니다.");
                     }
-                    return response.json(); // JSON 데이터 파싱
+                    return response.text(); // 서버로부터 HTML 반환
                 })
-                .then(data => {
-                    const tableBody = document.querySelector("table tbody");
-                    tableBody.innerHTML = ""; // 기존 테이블 내용을 비우기
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+                    const newTable = doc.querySelector("table"); // 새로운 테이블 추출
 
-                    data.forEach(report => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                            <td>${report.postTitle}</td>
-                            <td>${report.reportCount}</td>
-                            <td><a href="/posting/read/${report.postId}" class="btn btn-info">상세보기</a></td>
-                            <td>
-                                <button class="btn ${report.status === 'HIDDEN' ? 'btn-warning' : 'btn-success'}"
-                                        onclick="confirmToggleVisibility(${report.reportId}, '${report.status}')">
-                                    ${report.status === 'HIDDEN' ? '공개 처리' : '비공개 처리'}
-                                </button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
+                    // 기존 테이블을 대체
+                    const tableContainer = document.querySelector("table").parentNode;
+                    tableContainer.innerHTML = ""; // 기존 테이블 제거
+                    tableContainer.appendChild(newTable);
                 })
                 .catch(error => {
                     console.error("Error fetching report data:", error);
@@ -130,32 +223,50 @@
         }
 
         // 공개/비공개 상태 토글
-        function confirmToggleVisibility(toggleElement) {
-            const reportId = toggleElement.getAttribute("data-reportId");
-            const visible = toggleElement.checked; // 체크 여부 확인
-            const confirmation = confirm(visible ? "공개 처리하시겠습니까?" : "비공개 처리하시겠습니까?");
+        function confirmToggleVisibility(buttonElement) {
+            const reportId = buttonElement.getAttribute("data-reportId");
+            const currentStatus = buttonElement.getAttribute("data-status"); // 현재 상태 읽기
+            const isHidden = currentStatus === "HIDDEN"; // 비공개 상태 여부 확인
+
+            // 적절한 메시지 생성
+            const confirmationMessage = isHidden ? "공개 처리하시겠습니까?" : "비공개 처리하시겠습니까?";
+
+            const confirmation = confirm(confirmationMessage);
 
             if (confirmation) {
+                // 새로운 상태 결정
+                const visible = isHidden; // 비공개 상태면 true로 공개 처리
+
                 fetch(`/admin/reports/${reportId}/toggle-visibility`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ visible })
+                    body: JSON.stringify({ visible }) // visible 값 전송
                 })
                     .then(response => {
                         if (!response.ok) {
                             throw new Error("비공개/공개 처리 중 서버 오류가 발생했습니다.");
                         }
-                        alert(visible ? "공개 처리 완료" : "비공개 처리 완료");
+                        return response.text(); // 서버 응답 메시지 읽기
+                    })
+                    .then(message => {
+                        alert(message);
+
+                        // 버튼 상태 및 텍스트 업데이트
+                        const newStatus = visible ? "VISIBLE" : "HIDDEN";
+                        buttonElement.setAttribute("data-status", newStatus);
+                        buttonElement.textContent = visible ? "비공개 처리" : "공개 처리";
+                        buttonElement.className = `btn ${visible ? "btn-success" : "btn-warning"}`;
+
+                        // 공개된 글 보기 상태에서 비공개 처리를 하면 해당 행 제거
+                        if (!visible && document.getElementById("reportToggleSwitch").checked) {
+                            const row = buttonElement.closest("tr");
+                            row.remove(); // 해당 행을 삭제
+                        }
                     })
                     .catch(error => {
                         console.error("Error toggling visibility:", error);
                         alert("처리 중 오류가 발생했습니다.");
-                        // 상태를 이전 값으로 되돌림
-                        toggleElement.checked = !visible;
                     });
-            } else {
-                // 취소한 경우 상태를 되돌림
-                toggleElement.checked = !visible;
             }
         }
     </script>

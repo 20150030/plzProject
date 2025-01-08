@@ -14,8 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -87,29 +86,31 @@ public class ReportServiceImpl implements ReportService {
                 .map(this::convertToReportDTO)
                 .collect(Collectors.toList());
     }
-
-    /**
-     * 진행 중인(PENDING 상태) 신고를 조회합니다.
-     *
-     * @return 진행 중인 신고의 DTO 리스트
-     */
+//    특정 게시글 ID에 해당하는 신고 목록을 조회하여 DTO 리스트로 변환
     @Override
-    public List<ReportDTO> getReportsInProgress() {
-        List<Report> reports = reportRepository.findByStatus(Report.ReportStatus.PENDING);
+    public List<ReportDTO> getReportsByPostId(Long postId) {
+        List<Report> reports = reportRepository.findByPost_PostId(postId);
+
         return reports.stream()
                 .map(this::convertToReportDTO)
                 .collect(Collectors.toList());
     }
 
+
     /**
-     * 특정 게시글에 대한 신고를 조회합니다.
+     * 진행중 게시글에 대한 신고를 조회합니다.
      *
-     * @param postId 게시글 ID
-     * @return 해당 게시글의 신고 DTO 리스트
      */
     @Override
-    public List<ReportDTO> getReportsByPostId(Long postId) {
-        List<Report> reports = reportRepository.findByPost_PostId(postId);
+    public List<ReportDTO> getReportsInProgress() {
+        // 모든 신고 데이터를 가져와 공개 상태의 게시글만 필터링
+        List<Report> reports = reportRepository.findByStatus(Report.ReportStatus.PENDING).stream()
+                .filter(report -> Optional.ofNullable(report.getPost())
+                        .map(Post::isVisible) // 여기서 isVisible 메서드를 사용
+                        .orElse(false)) // Post가 null인 경우 false 반환
+                .collect(Collectors.toList());
+
+        // DTO 변환
         return reports.stream()
                 .map(this::convertToReportDTO)
                 .collect(Collectors.toList());
@@ -167,6 +168,31 @@ public class ReportServiceImpl implements ReportService {
                 .orElseThrow(() -> new EntityNotFoundException("신고를 찾을 수 없습니다."));
         return report.getPost().getPostId();
     }
+    @Override
+    public List<ReportDTO> getUniqueReportsWithCounts(Boolean onlyVisible) {
+        // 모든 신고 데이터를 가져와 게시글 ID로 그룹화
+        Map<Long, ReportDTO> groupedReports = reportRepository.findAll().stream()
+                .filter(report -> !onlyVisible || Optional.ofNullable(report.getPost())
+                        .map(Post::isVisible)
+                        .orElse(false)) // 공개 글만 가져올지 여부 결정
+                .collect(Collectors.toMap(
+                        report -> report.getPost().getPostId(), // 그룹화 기준: 게시글 ID
+                        report -> {
+                            // 신고 데이터를 DTO로 변환
+                            ReportDTO reportDTO = modelMapper.map(report, ReportDTO.class);
+                            reportDTO.setReportCount(1); // 신고 건수 초기화
+                            return reportDTO;
+                        },
+                        (existing, incoming) -> {
+                            // 같은 게시글 ID에 대한 신고 건수 합산
+                            existing.setReportCount(existing.getReportCount() + 1);
+                            return existing;
+                        }
+                ));
+
+        // 그룹화된 데이터를 리스트로 반환
+        return new ArrayList<>(groupedReports.values());
+    }
 
     /**
      * Report 엔티티를 ReportDTO로 변환합니다.
@@ -180,4 +206,5 @@ public class ReportServiceImpl implements ReportService {
         reportDTO.setPostId(report.getPost().getPostId()); // 게시글 ID 설정
         return reportDTO;
     }
+
 }

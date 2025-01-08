@@ -32,7 +32,7 @@ public class Reply {
     @Column(name = "regDate", updatable = false)
     private LocalDateTime regDate = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     @JoinColumn(name = "post_id", nullable = false)
     @JsonIgnore
     private Post post;

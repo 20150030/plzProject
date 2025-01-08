@@ -38,13 +38,19 @@ public class AdminController {
      * 신고 목록 조회
      */
     @GetMapping("/reports")
-    public String getReports(Model model) {
-        log.info("신고 목록 조회 요청");
+    public String getReports(
+            @RequestParam(value = "filter", defaultValue = "all") String filter, Model model) {
+        log.info("신고 목록 조회 요청, filter: {}", filter);
 
-        // 전체 신고 목록 조회
-        List<ReportDTO> reportList = reportService.getAllReports();
+        // 필터 설정
+        Boolean onlyVisible = "visible".equalsIgnoreCase(filter);
 
+        // 중복 신고 합산 및 필터 처리
+        List<ReportDTO> reportList = reportService.getUniqueReportsWithCounts(onlyVisible);
+
+        // 모델에 데이터 추가
         model.addAttribute("reportList", reportList);
+        model.addAttribute("filter", filter); // 현재 필터 값을 프론트엔드에 전달
 
         return "admin/reportList"; // 신고 리스트 페이지로 이동
     }
@@ -88,7 +94,7 @@ public class AdminController {
             postService.makePostInvisible(postId);
         }
 
-        return visible ? "신고글과 게시글이 공개 처리되었습니다." : "신고글과 게시글이 비공개 처리되었습니다.";
+        return visible ? "게시글이 공개 처리되었습니다." : "게시글이 비공개 처리되었습니다.";
     }
 
     /**

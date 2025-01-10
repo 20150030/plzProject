@@ -143,112 +143,140 @@
     </div>
   </section>
 
+  <!-- 모달 창 추가 -->
+  <div class="modal" tabindex="-1" id="locationModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">장소 입력 필요</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>장소를 입력하세요. 장소를 입력하지 않으면 게시글을 등록할 수 없습니다.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // 폼 제출 이벤트 핸들러
-    document.getElementById('postForm').addEventListener('submit', function (event) {
-      const fileInput = document.getElementById('files');
-      const useRandomImageInput = document.getElementById('useRandomImage');
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("postForm");
+      let map, infoWindow;
 
-      console.log("폼 제출 시작");
-      console.log("파일 입력 값:", fileInput.value);
-
-      if (!fileInput.value) { // 파일이 없을 경우
-        console.log("파일이 업로드되지 않았습니다.");
-        event.preventDefault(); // 기본 폼 제출 중단
-        const useRandomImage = confirm("이미지가 업로드되지 않았습니다. 랜덤 이미지를 사용하시겠습니까?");
-
-        if (useRandomImage) {
-          console.log("랜덤 이미지를 사용합니다.");
-          useRandomImageInput.value = "true"; // 랜덤 이미지 사용 설정
-          console.log("useRandomImageInput 값 설정 완료:", useRandomImageInput.value);
-          this.submit(); // 폼 다시 제출
-        } else {
-          console.log("사용자가 랜덤 이미지를 거부했습니다.");
-        }
-      } else {
-        console.log("파일이 업로드되었습니다. 폼을 정상적으로 제출합니다.");
-      }
-    });
-
-    let map, infoWindow;
-
-    // 지도 초기화
-    function initializeMap() {
-      console.log("지도 초기화 시작");
-      map = new naver.maps.Map("map", {
-        center: new naver.maps.LatLng(37.3595316, 127.1052133), // 초기 좌표
-        zoom: 15,
-      });
-
-      infoWindow = new naver.maps.InfoWindow({ anchorSkew: true });
-      console.log("지도 초기화 완료");
-
-      // 지도 클릭 이벤트
-      naver.maps.Event.addListener(map, "click", function (e) {
-        console.log("지도 클릭 이벤트 발생. 위도:", e.coord.lat(), "경도:", e.coord.lng());
-        setLatLng(e.coord); // 클릭한 위치의 위도와 경도를 설정
-      });
-
-      // 검색 버튼 클릭 이벤트
-      document.getElementById("searchButton").addEventListener("click", function () {
-        const address = document.getElementById("search").value;
-        console.log("검색 버튼 클릭. 입력된 주소:", address);
-        if (address.trim() === "") {
-          alert("장소를 입력하세요.");
-          return;
-        }
-        searchAddressToCoordinate(address);
-      });
-    }
-
-    // 위도와 경도를 숨겨진 필드에 설정
-    function setLatLng(coord) {
-      document.getElementById("latitude").value = coord.lat();
-      document.getElementById("longitude").value = coord.lng();
-      console.log("위도와 경도가 설정되었습니다. 위도:", coord.lat(), "경도:", coord.lng());
-    }
-
-    // 주소를 위도/경도로 변환
-    function searchAddressToCoordinate(address) {
-      console.log("주소를 위도/경도로 변환 시작:", address);
-      naver.maps.Service.geocode({ query: address }, function (status, response) {
-        if (status !== naver.maps.Service.Status.OK) {
-          console.error("주소 검색 실패:", status);
-          alert("검색 결과를 찾을 수 없습니다.");
-          return;
-        }
-
-        const result = response.v2.addresses[0]; // 첫 번째 검색 결과 사용
-        const coord = new naver.maps.LatLng(result.y, result.x);
-
-        map.setCenter(coord); // 지도 중심 이동
-        setLatLng(coord); // 위도와 경도를 숨겨진 필드에 설정
-
-        // 지도에 마커 표시
-        new naver.maps.Marker({
-          position: coord,
-          map: map,
+      // 지도 초기화
+      function initializeMap() {
+        console.log("지도 초기화 시작");
+        map = new naver.maps.Map("map", {
+          center: new naver.maps.LatLng(37.3595316, 127.1052133), // 초기 좌표
+          zoom: 15,
         });
 
-        infoWindow.setContent(`<div style="padding:10px;">${result.roadAddress || result.jibunAddress}</div>`);
-        infoWindow.open(map, coord);
-        console.log("주소 변환 완료. 위도:", coord.lat(), "경도:", coord.lng());
-      });
-    }
+        infoWindow = new naver.maps.InfoWindow({ anchorSkew: true });
+        console.log("지도 초기화 완료");
 
-    naver.maps.onJSContentLoaded = initializeMap;
+        // 지도 클릭 이벤트
+        naver.maps.Event.addListener(map, "click", function (e) {
+          console.log("지도 클릭 이벤트 발생. 위도:", e.coord.lat(), "경도:", e.coord.lng());
+          setLatLng(e.coord); // 클릭한 위치의 위도와 경도를 설정
+        });
 
-    document.getElementById('postForm').addEventListener('submit', function (event) {
-      const deadlineInput = document.getElementById('deadline').value;
-      const selectedDate = new Date(deadlineInput); // 사용자가 선택한 날짜
-      const today = new Date(); // 현재 날짜
-      // 시간 정보를 제거하고 날짜만 비교
-      today.setHours(0, 0, 0, 0);
-      selectedDate.setHours(0, 0, 0, 0);
-      if (selectedDate < today) {
-        alert("모집 마감일은 오늘 이후의 날짜여야 합니다.");
-        event.preventDefault(); // 폼 제출 중단
+        // 검색 버튼 클릭 이벤트
+        document.getElementById("searchButton").addEventListener("click", function () {
+          const address = document.getElementById("search").value;
+          console.log("검색 버튼 클릭. 입력된 주소:", address);
+          if (address.trim() === "") {
+            alert("장소를 입력하세요.");
+            return;
+          }
+          searchAddressToCoordinate(address);
+        });
       }
+
+      // 위도와 경도를 숨겨진 필드에 설정
+      function setLatLng(coord) {
+        document.getElementById("latitude").value = coord.lat();
+        document.getElementById("longitude").value = coord.lng();
+        console.log("위도와 경도가 설정되었습니다. 위도:", coord.lat(), "경도:", coord.lng());
+      }
+
+      // 주소를 위도/경도로 변환
+      function searchAddressToCoordinate(address) {
+        console.log("주소를 위도/경도로 변환 시작:", address);
+        naver.maps.Service.geocode({ query: address }, function (status, response) {
+          if (status !== naver.maps.Service.Status.OK) {
+            console.error("주소 검색 실패:", status);
+            alert("검색 결과를 찾을 수 없습니다.");
+            return;
+          }
+
+          const result = response.v2.addresses[0]; // 첫 번째 검색 결과 사용
+          const coord = new naver.maps.LatLng(result.y, result.x);
+
+          map.setCenter(coord); // 지도 중심 이동
+          setLatLng(coord); // 위도와 경도를 숨겨진 필드에 설정
+
+          // 지도에 마커 표시
+          new naver.maps.Marker({
+            position: coord,
+            map: map,
+          });
+
+          infoWindow.setContent(`<div style="padding:10px;">${result.roadAddress || result.jibunAddress}</div>`);
+          infoWindow.open(map, coord);
+          console.log("주소 변환 완료. 위도:", coord.lat(), "경도:", coord.lng());
+        });
+      }
+
+      naver.maps.onJSContentLoaded = initializeMap;
+
+      // 폼 제출 이벤트 핸들러
+      form.addEventListener("submit", function (event) {
+        const deadlineInput = document.getElementById("deadline").value;
+        const selectedDate = new Date(deadlineInput);
+        const today = new Date();
+        const latitude = document.getElementById("latitude").value;
+        const longitude = document.getElementById("longitude").value;
+        const fileInput = document.getElementById("files");
+        const useRandomImageInput = document.getElementById("useRandomImage");
+
+        // 현재 날짜와 입력 날짜 비교
+        today.setHours(0, 0, 0, 0);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+          alert("모집 마감일은 오늘 이후의 날짜여야 합니다.");
+          console.log("마감일 유효성 검사 실패");
+          event.preventDefault(); // 폼 제출 중단
+          return;
+        }
+
+        // 장소 정보 확인
+        if (!latitude || !longitude) {
+          console.log("장소 정보가 없습니다. 모달 창을 표시합니다.");
+          const locationModal = new bootstrap.Modal(document.getElementById("locationModal"));
+          locationModal.show();
+          event.preventDefault(); // 폼 제출 중단
+          return;
+        }
+
+        // 파일 업로드 여부 확인
+        if (!fileInput.value) {
+          const useRandomImage = confirm("이미지가 업로드되지 않았습니다. 랜덤 이미지를 사용하시겠습니까?");
+          if (useRandomImage) {
+            console.log("랜덤 이미지를 사용합니다.");
+            useRandomImageInput.value = "true"; // 랜덤 이미지 사용 설정
+          } else {
+            console.log("사용자가 랜덤 이미지를 거부했습니다.");
+            event.preventDefault(); // 폼 제출 중단
+            return;
+          }
+        }
+
+        console.log("폼을 정상적으로 제출합니다.");
+      });
     });
   </script>
 </div>

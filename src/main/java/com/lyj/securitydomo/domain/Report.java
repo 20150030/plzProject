@@ -19,12 +19,12 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reportId;  // 신고 ID 자동 생성
 
-    @ManyToOne
-    @JoinColumn(name = "postId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "postId", nullable = false) // 신고 대상 게시글 외래 키
     private Post post;  // 신고 대상 게시글
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false) // 신고자는 반드시 있어야 함
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false) // 신고자 외래 키 (필수)
     private User user;
 
     @Enumerated(EnumType.STRING) // 문자열로 저장

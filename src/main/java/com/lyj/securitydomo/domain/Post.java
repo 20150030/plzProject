@@ -1,5 +1,6 @@
 package com.lyj.securitydomo.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -47,8 +48,24 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user; // 작성자 정보
 
+    // 신고 (Report)와 연관 관계 설정
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Report> reports = new ArrayList<>();
+
+    // 신청 (Request)와 연관 관계 설정
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Request> requests = new ArrayList<>();
+
+    // 댓글 (Reply)와 연관 관계 설정
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference  // Post 객체에서 Reply 객체를 직렬화할 때 포함
+    @Builder.Default
+    private List<Reply> replies = new ArrayList<>();  // 댓글 리스트
 
 
+    // 이미지와 연관 관계 설정
     @OneToMany(mappedBy = "post",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,

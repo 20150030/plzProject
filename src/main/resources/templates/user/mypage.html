@@ -100,7 +100,11 @@
         <!-- 저장 및 취소 버튼 -->
         <div class="form-group mt-4">
             <button type="submit" class="btn btn-primary w-100 mb-2">정보 저장</button>
+            <button type="submit" class="btn btn-primary w-100 mb-2">저장</button>
             <button type="button" class="btn btn-outline-secondary w-100" onclick="window.location.href='/user/mypage';">취소</button>
+            <button type="button" class="btn btn-danger w-100 mt-2" onclick="if(confirm('정말로 탈퇴하시겠습니까?')) { window.location.href = '/user/delete'; }">
+                회원탈퇴
+            </button>
         </div>
     </form>
 </div>

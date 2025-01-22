@@ -18,7 +18,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString(exclude = "imageSet")
+//순환참조방지
+@ToString(exclude = {"user", "replies", "requests", "reports", "imageSet"})
+
 public class Post extends BaseEntity {
 
     @Id
@@ -44,7 +46,7 @@ public class Post extends BaseEntity {
     @Builder.Default
     private boolean isVisible = true; // 기본값: 게시글이 공개 상태
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = true)
     @JoinColumn(name = "user_id")
     private User user; // 작성자 정보
 
@@ -63,7 +65,10 @@ public class Post extends BaseEntity {
     @JsonManagedReference  // Post 객체에서 Reply 객체를 직렬화할 때 포함
     @Builder.Default
     private List<Reply> replies = new ArrayList<>();  // 댓글 리스트
-
+    // 댓글 리스트 getter
+    public List<Reply> getReplies() {
+        return replies;
+    }
 
     // 이미지와 연관 관계 설정
     @OneToMany(mappedBy = "post",

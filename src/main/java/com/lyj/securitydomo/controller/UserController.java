@@ -7,10 +7,14 @@ import com.lyj.securitydomo.repository.UserRepository;
 import com.lyj.securitydomo.service.PostService;
 import com.lyj.securitydomo.service.RequestService;
 import com.lyj.securitydomo.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +36,12 @@ public class UserController {
     private final ModelMapper modelMapper;
     private final RequestService requestService;
 
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+        return "redirect:/"; // 메인 페이지로 리디렉션
+    }
 
     // 회원가입 페이지로 이동
     @GetMapping("/join")
@@ -131,7 +141,7 @@ public class UserController {
     }
 
     // 회원 탈퇴 기능
-    @PostMapping("/delete")
+    @GetMapping("/delete")
     public String deleteUser(@AuthenticationPrincipal PrincipalDetails principal) {
         User user = principal.getUser();
         userService.deleteUser(user.getUserId()); // 필드명이 userId일 경우

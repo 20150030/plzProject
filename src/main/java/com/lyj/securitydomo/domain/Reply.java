@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "reply")
+
 public class Reply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +33,7 @@ public class Reply {
     @Column(name = "regDate", updatable = false)
     private LocalDateTime regDate = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     @JsonIgnore
     private Post post;

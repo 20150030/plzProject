@@ -162,13 +162,26 @@
 
                     <!-- 로그인/로그아웃 -->
                     <ul class="navbar-nav ms-auto">
+                        <!-- 로그인 링크 -->
                         <li sec:authorize="!isAuthenticated()" class="nav-item">
                             <a class="nav-link" href="/user/login"><i class="bi bi-box-arrow-in-right"></i> 로그인</a>
                         </li>
+
+                        <!-- 로그아웃 링크 -->
                         <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout ([[${#authentication.principal.username}]])</a>
+                            <!-- 로그아웃 버튼 -->
+                            <a class="nav-link" href="#" onclick="document.getElementById('logoutForm').submit();">
+                                <i class="bi bi-box-arrow-right"></i> Logout ([[${#authentication.principal.username}]])
+                            </a>
+
+                            <!-- 로그아웃 POST 요청용 폼 -->
+                            <form id="logoutForm" action="/user/logout" method="POST" style="display: none;">
+                                <!-- Spring Security CSRF 토큰 추가 -->
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            </form>
                         </li>
                     </ul>
+
                 </div>
             </div>
         </nav>

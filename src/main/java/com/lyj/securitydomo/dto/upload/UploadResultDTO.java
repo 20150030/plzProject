@@ -46,7 +46,6 @@ public class UploadResultDTO {
     public static String getRandomImage() {
         String[] defaultImages = {
                 "https://cdn.blueconomy.co.kr/news/photo/202402/2399_3001_921.png",
-                "https://i.namu.wiki/i/gYcA1HTcdvXbMbun0_63Ix0tuxPrDwioIiEUj78aG0h2d2KCpOb120QN4Mru_SbPgD0L_jrYBprE0yg8b_-6Vw8ZoSLNcf3gKj8Ti93FUVjXbdba0SYumsNC19zXnUMh2xl2HRCr0ms1oX3ABMLIvQ.webp",
                 "https://cdn.sisaweek.com/news/photo/202004/132716_121857_70.jpg"
         };
         Random random = new Random();

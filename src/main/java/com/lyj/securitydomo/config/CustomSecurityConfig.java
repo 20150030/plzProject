@@ -29,7 +29,7 @@ public class CustomSecurityConfig {
                 // CSRF 설정
                 .csrf(csrf -> csrf
                         // 특정 요청 경로에 대해 CSRF 보호를 비활성화
-                        .ignoringRequestMatchers("/report/create", "/user/delete", "/user/logout")
+                        .ignoringRequestMatchers("/report/create", "/user/delete", "/user/logout","/request/create")
                         // CSRF 토큰을 쿠키로 저장 (JavaScript에서도 사용 가능하도록 설정)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 // 각 요청에 대한 권한 설정
@@ -39,7 +39,9 @@ public class CustomSecurityConfig {
                         // 로그인, 회원가입, 특정 경로는 인증 없이 접근 가능
                         .requestMatchers("/login", "/signup", "/replies/**", "/user/**", "/", "/all", "/posting/**", "/view/**").permitAll()
                         // POST 요청의 특정 경로에 대해 접근 허용
-                        .requestMatchers(HttpMethod.POST, "/report/create").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/report/create","/request/create","/user/logout").permitAll()
+                        // GET 요청의 특정 경로에 대해 접근 허용
+                        .requestMatchers(HttpMethod.GET, "/user/delete","/user/logout").permitAll()
                         // 관리자 경로는 ADMIN 권한 필요
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         // 정적 리소스 (이미지, CSS, JS 등)는 인증 없이 접근 허용

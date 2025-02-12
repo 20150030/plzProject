@@ -23,6 +23,8 @@ import org.modelmapper.ModelMapper;
 
 import java.util.List;
 
+import static com.lyj.securitydomo.domain.QRequest.request;
+
 
 @Log4j2
 @Controller
@@ -142,10 +144,17 @@ public class UserController {
 
     // 회원 탈퇴 기능
     @GetMapping("/delete")
-    public String deleteUser(@AuthenticationPrincipal PrincipalDetails principal) {
-        User user = principal.getUser();
-        userService.deleteUser(user.getUserId()); // 필드명이 userId일 경우
-        return "redirect:/user/logout"; // 로그아웃 후 메인 페이지로 이동
+    public String deleteUser(@AuthenticationPrincipal PrincipalDetails principal,
+                             HttpServletRequest request, HttpServletResponse response) {
+        log.info("회원 탈퇴 요청 - 사용자 ID: {}", principal.getUser().getUserId());
+
+        userService.deleteUser(principal.getUser().getUserId()); // 사용자 삭제
+        log.info("회원 탈퇴 완료");
+
+        // 직접 로그아웃 수행
+        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
+        return "redirect:/"; // 메인 페이지로 이동
     }
 
     @GetMapping("/mywriting")

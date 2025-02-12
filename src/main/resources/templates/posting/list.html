@@ -126,6 +126,7 @@
           가까운 이웃과 함께 도움을 부탁해요!”</p>
       </div>
 
+
     </div>
   </header>
 
@@ -370,6 +371,7 @@
       document.getElementById('submitApplication').addEventListener('click', function () {
         const postId = parseInt(this.getAttribute('data-post-id'), 10);
         const applicationReason = document.getElementById('applicationReason').value.trim();
+        const userId = document.getElementById('currentUser').getAttribute('data-user-id');
 
         if (!applicationReason) {
           alert('신청 사유를 입력해주세요.');
@@ -383,6 +385,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             postId: postId,
+            userId: userId,
             contentText: applicationReason,
           }),
         })

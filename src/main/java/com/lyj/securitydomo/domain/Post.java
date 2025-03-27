@@ -46,7 +46,7 @@ public class Post extends BaseEntity {
     @Builder.Default
     private boolean isVisible = true; // 기본값: 게시글이 공개 상태
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "user_id")
     private User user; // 작성자 정보
 

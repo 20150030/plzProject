@@ -33,8 +33,10 @@ public class CustomSecurityConfig {
                                 "/report/create",
                                 "/user/delete",
                                 "/user/logout",
-                                "/request/create",
-                                "/replies/**"
+                                "/posting/**",
+                                "/request/**",
+                                "/replies/**",
+                                "/admin/**"
                         )
                         // CSRF 토큰을 쿠키로 저장 (JavaScript에서도 사용 가능하도록 설정)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
@@ -45,9 +47,9 @@ public class CustomSecurityConfig {
                         // 로그인, 회원가입, 특정 경로는 인증 없이 접근 가능
                         .requestMatchers("/login", "/signup", "/replies/**", "/user/**", "/", "/all", "/posting/**", "/view/**").permitAll()
                         // POST 요청의 특정 경로에 대해 접근 허용
-                        .requestMatchers(HttpMethod.POST, "/report/create","/request/create","/user/logout","/replies/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/report/create","/request/create","/user/logout","/replies/**","/request/**","/posting/**").permitAll()
                         // GET 요청의 특정 경로에 대해 접근 허용
-                        .requestMatchers(HttpMethod.GET, "/user/delete","/user/logout","/replies/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user/delete","/user/logout","/replies/**","/request/**").permitAll()
                         // 관리자 경로는 ADMIN 권한 필요
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         // 정적 리소스 (이미지, CSS, JS 등)는 인증 없이 접근 허용

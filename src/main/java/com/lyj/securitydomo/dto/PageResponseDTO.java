@@ -40,7 +40,7 @@ public class PageResponseDTO<E> {
 
         // 시작 및 끝 페이지 번호 계산
         this.end = (int) (Math.ceil(this.page / 10.0)) * 10; // 화면에서의 끝 페이지
-        this.start = this.end - 9; // 화면에서의 시작 페이지
+        this.start = this.end - 8; // 화면에서의 시작 페이지
 
         int last = (int) (Math.ceil((double) total / size)); // 데이터 개수를 기반으로 한 마지막 페이지
 
